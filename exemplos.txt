@@ -64,3 +64,294 @@ const styles = StyleSheet.create({
   },
 });
 
+-- Picker (selected) --
+import {Picker} from '@react-native-picker/picker';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      pizza: 0,
+      pizzas: [
+        {key: 1, nome: 'Strogonoff', value: 35.9},
+        {key: 2, nome: 'Calabresa', value: 30.5},
+        {key: 3, nome: 'Palmito', value: 28.9},
+        {key: 4, nome: 'Frango', value: 20.0},
+      ],
+    };
+  }
+  render() {
+    const {state} = this;
+    return (
+      <View style={styles.container}>
+        <Text style={styles.logo}>Menu de Pizza</Text>
+
+        <Picker
+          selectedValue={state.pizza}
+          onValueChange={(itemValue, itemIndex) =>
+            this.setState({pizza: itemValue})
+          }>
+          {state.pizzas.map((item, k) => (
+            <Picker.Item key={k} value={k} label={item.nome} />
+          ))}
+        </Picker>
+        <Text style={styles.pizzas}>
+          Você escolheu: {state.pizzas[state.pizza].nome}
+        </Text>
+        <Text style={styles.pizzas}>
+          R$ {state.pizzas[state.pizza].value.toFixed(2)}
+        </Text>
+      </View>
+    );
+  }
+}
+
+const styles
+
+-- Slider --
+npm install @react-native-community/slider --save
+import Slider from '@react-native-community/slider';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      valor: 0,
+    };
+  }
+  render() {
+    const {state} = this;
+    return (
+      <View style={styles.container}>
+        <Slider
+          minimumValue={0}
+          minimumTrackTintColor="#00ff00"
+          maximumValue={100}
+          maximumTrackTintColor="#ff0000"
+          onValueChange={(valorSelecionado) =>
+            this.setState({valor: valorSelecionado})
+          }
+          value={state.valor}
+        />
+        <Text style={{fontSize: 80, textAlign: 'center', color: 'red'}}>
+          {state.valor.toFixed(0)}
+        </Text>
+      </View>
+    );
+  }
+}
+
+-- Switch --
+import {StyleSheet, View, Text, Switch} from 'react-native';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      ligado: false,
+    };
+  }
+  render() {
+    const {state} = this;
+    return (
+      <View style={styles.container}>
+        <Switch
+          value={state.ligado}
+          onValueChange={(valorSitch) => this.setState({ligado: valorSitch})}
+          thumbColor="#ff0000"
+        />
+        <Text style={{fontSize: 40, textAlign: 'center'}}>
+          {state.ligado ? 'Ativo' : 'Inativo'}
+        </Text>
+      </View>
+    );
+  }
+}
+
+-- Async Storage --
+ npm i @react-native-community/async-storage --save
+
+import AsyncStorage from '@react-native-community/async-storage';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      input: '',
+      nome: '',
+    };
+  }
+  async componentDidMount() {
+    await AsyncStorage.getItem('nome').then((value) => {
+      this.setState({nome: value});
+    });
+  }
+
+  async componentDidUpdate(_, prevState) {
+    const {nome} = this.state;
+    if (prevState !== nome) {
+      await AsyncStorage.setItem('nome', nome);
+    }
+  }
+
+  render() {
+    const gravanome = () => {
+      this.setState({
+        nome: this.state.input,
+      });
+      alert('Salvo com sucesso!');
+      Keyboard.dismiss();
+    };
+    const {state} = this;
+    return (
+      <View style={styles.container}>
+        <View style={styles.viewInput}>
+          <TextInput
+            style={styles.input}
+            placeholder="Nome"
+            value={state.input}
+            onChangeText={(text) => this.setState({input: text})}
+          />
+          <TouchableOpacity onPress={gravanome}>
+            <Text style={styles.botao}>+</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.nome}>{state.nome}</Text>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  viewInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  input: {
+    width: 350,
+    height: 40,
+    borderColor: '#000',
+    borderWidth: 1,
+    padding: 10,
+  },
+  botao: {
+    backgroundColor: '#222',
+    color: '#fff',
+    height: 40,
+    padding: 10,
+    marginLeft: 3,
+  },
+  nome: {
+    marginTop: 15,
+    fontSize: 30,
+    textAlign: 'center',
+  },
+});
+
+-- Modal --
+import Entrar from './src/components/Entrar';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      modalVisible: false,
+    };
+  }
+  render() {
+    const {state} = this;
+    const entrar = () => {
+      this.setState({modalVisible: true});
+    };
+    const fecharModal = (visible) => {
+      this.setState({
+        modalVisible: visible,
+      });
+    };
+    return (
+      <View style={styles.container}>
+        <Button title="Entrar" onPress={entrar} />
+        <Modal
+          transparent={true}
+          animationType="slide"
+          visible={state.modalVisible}>
+          <View style={styles.modalView}>
+            <Entrar fechar={() => fecharModal(false)} />
+          </View>
+        </Modal>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ddd',
+  },
+  modalView: {
+    margin: 15,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+-- Requisição HTTP --
+npm i axios --save
+import api from './src/services/api';
+import Filmes from './src/components/Filmes';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      filmes: [],
+      loading: true,
+    };
+  }
+  async componentDidMount() {
+    const response = await api.get('r-api/?api=filmes');
+    this.setState({filmes: response.data, loading: false});
+  }
+  render() {
+    const {state} = this;
+    if (state.loading) {
+      return (
+        <View style={styles.loading}>
+          <ActivityIndicator color="#09a6ff" size={40} />
+        </View>
+      );
+    } else {
+      return (
+        <View style={styles.container}>
+          <FlatList
+            data={state.filmes}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({item}) => <Filmes data={item} />}
+          />
+        </View>
+      );
+    }
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
+
+-- Animações --
